@@ -1,7 +1,22 @@
 /* === Imports === */
-
+import { initializeApp } from "firebase/app";
 /* === Firebase Setup === */
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyAErYsF50kZVDR65qFqCKsbVcSAACafME8",
+  authDomain: "moody-54606.firebaseapp.com",
+  projectId: "moody-54606",
+  storageBucket: "moody-54606.appspot.com"
+};
+
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
 /* === UI === */
 
 /* == UI - Elements == */
