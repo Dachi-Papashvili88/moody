@@ -1,12 +1,7 @@
-/* === Firebase Setup === */
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAErYsF50kZVDR65qFqCKsbVcSAACafME8",
   authDomain: "moody-54606.firebaseapp.com",
@@ -58,9 +53,19 @@ function authSignInWithEmail() {
 }
 
 function authCreateAccountWithEmail() {
-    console.log("Sign up with email and password")
+    const email = emailInputEl.value 
+    const password = passwordInputEl.value 
+
+createUserWithEmailAndPassword(auth, email, password)
+  .then((userCredential) => {
+    showLoggedInView()
+  })
+  .catch((error) => {
+    console.error(error.message)
+  });
 }
 
+authCreateAccountWithEmail()
 /* == Functions - UI Functions == */
 
 function showLoggedOutView() {
