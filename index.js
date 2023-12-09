@@ -3,7 +3,8 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  signOut
+  signOut,
+  onAuthStateChanged,
 } from "firebase/auth";
 
 const firebaseConfig = {
@@ -47,7 +48,13 @@ signOutButtonEl.addEventListener("click", authSignOut);
 
 /* === Main Code === */
 
-showLoggedOutView();
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    showLoggedInView()
+  } else {
+    showLoggedOutView()
+  }
+});
 
 /* === Functions === */
 
@@ -60,12 +67,10 @@ function authSignInWithGoogle() {
 function authSignInWithEmail() {
   const email = emailInputEl.value;
   const password = passwordInputEl.value;
+
   signInWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
-      clearAuthFields()
-      showLoggedInView();
-      const user = userCredential.user;
-      // ...
+      clearAuthFields();
     })
     .catch((error) => {
       console.error(error.message);
@@ -78,8 +83,7 @@ function authCreateAccountWithEmail() {
 
   createUserWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
-      clearAuthFields()
-      showLoggedInView();
+      clearAuthFields();
     })
     .catch((error) => {
       console.error(error.message);
@@ -87,37 +91,38 @@ function authCreateAccountWithEmail() {
 }
 
 function authSignOut() {
-  signOut(auth).then(() => {
-    showLoggedOutView()
-  }).catch((error) => {
-    console.error(error.message)
-  });
+  signOut(auth)
+    .then(() => {
+    })
+    .catch((error) => {
+      console.error(error.message);
+    });
 }
 /* == Functions - UI Functions == */
 
 function showLoggedOutView() {
-  hideView(viewLoggedIn)
-  showView(viewLoggedOut)
+  hideView(viewLoggedIn);
+  showView(viewLoggedOut);
 }
 
 function showLoggedInView() {
-  hideView(viewLoggedOut)
-  showView(viewLoggedIn)
+  hideView(viewLoggedOut);
+  showView(viewLoggedIn);
 }
 
 function showView(view) {
-  view.style.display = "flex"
+  view.style.display = "flex";
 }
 
 function hideView(view) {
-  view.style.display = "none"
+  view.style.display = "none";
 }
 
 function clearInputField(field) {
-field.value = ""
+  field.value = "";
 }
 
 function clearAuthFields() {
-clearInputField(emailInputEl)
-clearInputField(passwordInputEl)
+  clearInputField(emailInputEl);
+  clearInputField(passwordInputEl);
 }
