@@ -5,7 +5,8 @@ import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
-  GoogleAuthProvider, signInWithPopup
+  GoogleAuthProvider,
+  signInWithPopup,
 } from "firebase/auth";
 
 const firebaseConfig = {
@@ -48,14 +49,16 @@ createAccountButtonEl.addEventListener("click", authCreateAccountWithEmail);
 
 signOutButtonEl.addEventListener("click", authSignOut);
 
-const userProfilePictureEl = document.getElementById("user-profile-picture")
+const userProfilePictureEl = document.getElementById("user-profile-picture");
+const userGreetingEl = document.getElementById("user-greeting");
 
 /* === Main Code === */
 
 onAuthStateChanged(auth, (user) => {
   if (user) {
     showLoggedInView();
-    showProfilePicture(userProfilePictureEl, user)
+    showProfilePicture(userProfilePictureEl, user);
+    showUserGreeting(userGreetingEl, user);
   } else {
     showLoggedOutView();
   }
@@ -67,13 +70,13 @@ onAuthStateChanged(auth, (user) => {
 
 function authSignInWithGoogle() {
   signInWithPopup(auth, provider)
-  .then((result) => {
-    console.log("sign in with google")
-  }).catch((error) => {
-    console.error(error.message)
-  });
-
-  }
+    .then((result) => {
+      console.log("sign in with google");
+    })
+    .catch((error) => {
+      console.error(error.message);
+    });
+}
 
 function authSignInWithEmail() {
   const email = emailInputEl.value;
@@ -137,13 +140,23 @@ function clearAuthFields() {
   clearInputField(passwordInputEl);
 }
 
-
 function showProfilePicture(imgElement, user) {
   const photoURL = user.photoURL;
 
-  if(photoURL) {
-    imgElement.src = photoURL
+  if (photoURL) {
+    imgElement.src = photoURL;
   } else {
-    imgElement.src = "assets/images/profile-photo.jpg"
+    imgElement.src = "assets/images/profile-photo.jpg";
+  }
+}
+
+function showUserGreeting(element, user) {
+  const displayName = user.displayName;
+  if (displayName) {
+    const userFirstName = displayName.split(" ")[0];
+
+    element.textContent = `Hey ${userFirstName}, how are you?`;
+  } else {
+    element.textContent = `Hey friend, how are you?`;
   }
 }
