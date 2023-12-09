@@ -5,6 +5,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  GoogleAuthProvider, signInWithPopup
 } from "firebase/auth";
 
 const firebaseConfig = {
@@ -17,6 +18,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
 
 /* === UI === */
 
@@ -46,13 +48,16 @@ createAccountButtonEl.addEventListener("click", authCreateAccountWithEmail);
 
 signOutButtonEl.addEventListener("click", authSignOut);
 
+const userProfilePictureEl = document.getElementById("user-profile-picture")
+
 /* === Main Code === */
 
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    showLoggedInView()
+    showLoggedInView();
+    showProfilePicture(userProfilePictureEl, user)
   } else {
-    showLoggedOutView()
+    showLoggedOutView();
   }
 });
 
@@ -61,8 +66,14 @@ onAuthStateChanged(auth, (user) => {
 /* = Functions - Firebase - Authentication = */
 
 function authSignInWithGoogle() {
-  console.log("Sign in with Google");
-}
+  signInWithPopup(auth, provider)
+  .then((result) => {
+    console.log("sign in with google")
+  }).catch((error) => {
+    console.error(error.message)
+  });
+
+  }
 
 function authSignInWithEmail() {
   const email = emailInputEl.value;
@@ -92,8 +103,7 @@ function authCreateAccountWithEmail() {
 
 function authSignOut() {
   signOut(auth)
-    .then(() => {
-    })
+    .then(() => {})
     .catch((error) => {
       console.error(error.message);
     });
@@ -125,4 +135,15 @@ function clearInputField(field) {
 function clearAuthFields() {
   clearInputField(emailInputEl);
   clearInputField(passwordInputEl);
+}
+
+
+function showProfilePicture(imgElement, user) {
+  const photoURL = user.photoURL;
+
+  if(photoURL) {
+    imgElement.src = photoURL
+  } else {
+    imgElement.src = "assets/images/profile-photo.jpg"
+  }
 }
