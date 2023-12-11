@@ -8,6 +8,8 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
 } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyAErYsF50kZVDR65qFqCKsbVcSAACafME8",
@@ -20,6 +22,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
+const db = getFirestore(app);
 
 /* === UI === */
 
@@ -40,6 +43,9 @@ const createAccountButtonEl = document.getElementById("create-account-btn");
 
 const signOutButtonEl = document.getElementById("sign-out-btn");
 
+const userProfilePictureEl = document.getElementById("user-profile-picture");
+const userGreetingEl = document.getElementById("user-greeting");
+
 /* == UI - Event Listeners == */
 
 signInWithGoogleButtonEl.addEventListener("click", authSignInWithGoogle);
@@ -49,8 +55,7 @@ createAccountButtonEl.addEventListener("click", authCreateAccountWithEmail);
 
 signOutButtonEl.addEventListener("click", authSignOut);
 
-const userProfilePictureEl = document.getElementById("user-profile-picture");
-const userGreetingEl = document.getElementById("user-greeting");
+
 
 /* === Main Code === */
 
@@ -146,7 +151,7 @@ function showProfilePicture(imgElement, user) {
   if (photoURL) {
     imgElement.src = photoURL;
   } else {
-    imgElement.src = "assets/images/profile-photo.jpg";
+    imgElement.src = "assets/images/default-profile-picture.jpeg";
   }
 }
 
