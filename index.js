@@ -122,10 +122,11 @@ function authSignOut() {
 
 /* = Functions - Firebase - Cloud Firestore = */
 
-async function addPostToDB(postBody) {
+async function addPostToDB(postBody, user) {
   try {
     const docRef = await addDoc(collection(db, "posts"), {
-      body: postBody
+      body: postBody, 
+      uid: user.uid
     });
     console.log("Document written with ID: ", docRef.id);
   } catch (error) {
@@ -137,11 +138,12 @@ async function addPostToDB(postBody) {
 /* == Functions - UI Functions == */
 
 function postButtonPressed() {
-  const postBody = textareaEl.value;
-
+  const postBody = textareaEl.value
+  const user = auth.currentUser
+  
   if (postBody) {
-     addPostToDB(postBody)
-    clearInputField(textareaEl);
+      addPostToDB(postBody, user)
+      clearInputField(textareaEl)
   }
 }
 
