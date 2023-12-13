@@ -8,7 +8,8 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
 } from "firebase/auth";
-import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { getFirestore, collection, addDoc, serverTimestamp } from "firebase/firestore";
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyAErYsF50kZVDR65qFqCKsbVcSAACafME8",
@@ -126,7 +127,10 @@ async function addPostToDB(postBody, user) {
   try {
     const docRef = await addDoc(collection(db, "posts"), {
       body: postBody, 
-      uid: user.uid
+      uid: user.uid,
+      createdAt: serverTimestamp()
+
+
     });
     console.log("Document written with ID: ", docRef.id);
   } catch (error) {
