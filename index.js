@@ -1,25 +1,27 @@
-/* === Imports === */
-import { initializeApp } from "firebase/app"
-import { getAuth,
-         createUserWithEmailAndPassword,
-         signInWithEmailAndPassword,
-         signOut,
-         onAuthStateChanged, 
-         GoogleAuthProvider,
-         signInWithPopup } from "firebase/auth"
+import { initializeApp } from "firebase/app";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from "firebase/auth";
 import { getFirestore,
-         collection,
-         addDoc,
-         serverTimestamp } from "firebase/firestore"
+  collection,
+  addDoc,
+  serverTimestamp,
+  getDocs } from "firebase/firestore"
 
-/* === Firebase Setup === */
-/* IMPORTANT: Replace this with your own firebaseConfig when doing challenges */
 const firebaseConfig = {
-    apiKey: "AIzaSyBM1JtWaj4B_RyDqfnl9yqULGf3U0L33Sk",
-    authDomain: "moody-8f7be.firebaseapp.com",
-    projectId: "moody-8f7be",
-    storageBucket: "moody-8f7be.appspot.com" 
-}
+  apiKey: "AIzaSyAErYsF50kZVDR65qFqCKsbVcSAACafME8",
+  authDomain: "moody-54606.firebaseapp.com",
+  projectId: "moody-54606",
+  storageBucket: "moody-54606.appspot.com",
+};
+
+// Initialize Firebase
 
 const app = initializeApp(firebaseConfig)
 const auth = getAuth(app)
@@ -50,6 +52,10 @@ const moodEmojiEls = document.getElementsByClassName("mood-emoji-btn")
 const textareaEl = document.getElementById("post-input")
 const postButtonEl = document.getElementById("post-btn")
 
+const fetchPostsButtonEl = document.getElementById("fetch-posts-btn")
+
+const postsEl = document.getElementById("posts")
+
 /* == UI - Event Listeners == */
 
 signInWithGoogleButtonEl.addEventListener("click", authSignInWithGoogle)
@@ -64,6 +70,8 @@ for (let moodEmojiEl of moodEmojiEls) {
 }
 
 postButtonEl.addEventListener("click", postButtonPressed)
+
+fetchPostsButtonEl.addEventListener("click", fetchOnceAndRenderPostsFromDB)
 
 /* === State === */
 
@@ -142,10 +150,33 @@ async function addPostToDB(postBody, user) {
     } catch (error) {
         console.error(error.message)
     }
+}
 
+async function fetchOnceAndRenderPostsFromDB() {
+    const querySnapshot = await getDocs(collection(db, "posts"))
+    
+    clearAll(postsEl)
+    
+    querySnapshot.forEach((doc) => {
+        renderPost(postsEl, doc.data())
+    })
 }
 
 /* == Functions - UI Functions == */
+
+function renderPost(postsEl, postData) {
+    postsEl.innerHTML += `
+        <div class="post">
+            <div class="header">
+                <h3>${displayDate(postData.createdAt)}</h3>
+                <img src="assets/emojis/${postData.mood}.png">
+            </div>
+            <p>
+                ${postData.body}
+            </p>
+        </div>
+    `
+}
 
 function postButtonPressed() {
     const postBody = textareaEl.value
@@ -156,6 +187,10 @@ function postButtonPressed() {
         clearInputField(textareaEl)
         resetAllMoodElements(moodEmojiEls)
     }
+}
+
+function clearAll(element) {
+    element.innerHTML = ""
 }
 
 function showLoggedOutView() {
@@ -205,6 +240,23 @@ function showUserGreeting(element, user) {
     } else {
         element.textContent = `Hey friend, how are you?`
     }
+}
+
+function displayDate(firebaseDate) {
+    const date = firebaseDate.toDate()
+    
+    const day = date.getDate()
+    const year = date.getFullYear()
+    
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    const month = monthNames[date.getMonth()]
+
+    let hours = date.getHours()
+    let minutes = date.getMinutes()
+    hours = hours < 10 ? "0" + hours : hours
+    minutes = minutes < 10 ? "0" + minutes : minutes
+
+    return `${day} ${month} ${year} - ${hours}:${minutes}`
 }
 
 /* = Functions - UI Functions - Mood = */
