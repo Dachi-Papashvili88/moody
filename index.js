@@ -192,6 +192,30 @@ function fetchTodayPosts(user) {
     fetchInRealtimeAndRenderPostsFromDB(q, user)                  
 }
 
+function fetchWeekPosts(user) {
+  const startOfWeek = new Date()
+  startOfWeek.setHours(0, 0, 0, 0)
+  
+  if (startOfWeek.getDay() === 0) { // If today is Sunday
+      startOfWeek.setDate(startOfWeek.getDate() - 6) // Go to previous Monday
+  } else {
+      startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay() + 1)
+  }
+
+  const endOfDay = new Date()
+    endOfDay.setHours(23, 59, 59, 999)
+
+
+    const postsRef = collection(db, collectionName)
+    
+    const q = query(postsRef, where("uid", "==", user.uid),
+                              where("createdAt", ">=", startOfWeek),
+                              where("createdAt", "<=", endOfDay),
+                              orderBy("createdAt", "desc"))
+                              
+    fetchInRealtimeAndRenderPostsFromDB(q, user) 
+}
+
 /* == Functions - UI Functions == */
 
 function renderPost(postsEl, postData) {
@@ -359,5 +383,5 @@ function selectFilter(event) {
     
     updateFilterButtonStyle(selectedFilterElement)
     
-    fetchTodayPosts(user)
+    fetchWeekPosts(user)
 }
