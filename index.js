@@ -14,7 +14,8 @@ import {
   addDoc,
   serverTimestamp,
   onSnapshot,
-  QuerySnapshot,
+  query,
+  where,
 } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -89,7 +90,7 @@ onAuthStateChanged(auth, (user) => {
     showLoggedInView();
     showProfilePicture(userProfilePictureEl, user);
     showUserGreeting(userGreetingEl, user);
-    fetchInRealtimeAndRenderPostsFromDB()
+    fetchInRealtimeAndRenderPostsFromDB(user);
   } else {
     showLoggedOutView();
   }
@@ -159,13 +160,18 @@ async function addPostToDB(postBody, user) {
   }
 }
 
-function fetchInRealtimeAndRenderPostsFromDB() {
-    onSnapshot(collection(db, collectionName), (querySnapshot) => {
-        clearAll(postsEl)
-        querySnapshot.forEach((doc)=> {
-           renderPost(postsEl, doc.data())
-        })
+function fetchInRealtimeAndRenderPostsFromDB(user) {
+  const postRef = collection(db, collectionName);
+
+const q = query(postRef, where("uid", "==", user.uid));
+
+  onSnapshot(q, (querySnapshot) => {
+    clearAll(postsEl)
+    
+    querySnapshot.forEach((doc) => {
+        renderPost(postsEl, doc.data())
     })
+})
 }
 
 /* == Functions - UI Functions == */
@@ -253,9 +259,9 @@ function showUserGreeting(element, user) {
 }
 
 function displayDate(firebaseDate) {
-    if(!firebaseDate){
-        return "Date processing"
-    }
+  if (!firebaseDate) {
+    return "Date processing";
+  }
   const date = firebaseDate.toDate();
 
   const day = date.getDate();
