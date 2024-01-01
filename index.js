@@ -194,19 +194,18 @@ function fetchTodayPosts(user) {
 }
 
 function fetchWeekPosts(user) {
-  const startOfWeek = new Date()
-  startOfWeek.setHours(0, 0, 0, 0)
-  
-  if (startOfWeek.getDay() === 0) { // If today is Sunday
-      startOfWeek.setDate(startOfWeek.getDate() - 6) // Go to previous Monday
-  } else {
-      startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay() + 1)
-  }
-
-  const endOfDay = new Date()
+    const startOfWeek = new Date()
+    startOfWeek.setHours(0, 0, 0, 0)
+    
+    if (startOfWeek.getDay() === 0) { // If today is Sunday
+        startOfWeek.setDate(startOfWeek.getDate() - 6) // Go to previous Monday
+    } else {
+        startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay() + 1)
+    }
+    
+    const endOfDay = new Date()
     endOfDay.setHours(23, 59, 59, 999)
-
-
+    
     const postsRef = collection(db, collectionName)
     
     const q = query(postsRef, where("uid", "==", user.uid),
@@ -214,51 +213,81 @@ function fetchWeekPosts(user) {
                               where("createdAt", "<=", endOfDay),
                               orderBy("createdAt", "desc"))
                               
-    fetchInRealtimeAndRenderPostsFromDB(q, user) 
+    fetchInRealtimeAndRenderPostsFromDB(q, user)
 }
 
-
 function fetchMonthPosts(user) {
-  const startOfMonth = new Date()
-  startOfMonth.setHours(0, 0, 0, 0)
-  startOfMonth.setDate(1)
+    const startOfMonth = new Date()
+    startOfMonth.setHours(0, 0, 0, 0)
+    startOfMonth.setDate(1)
 
-  const endOfDay = new Date()
-  endOfDay.setHours(23, 59, 59, 999)
+    const endOfDay = new Date()
+    endOfDay.setHours(23, 59, 59, 999)
 
-const postsRef = collection(db, collectionName)
-  
-  const q = query(postsRef, where("uid", "==", user.uid),
-                            where("createdAt", ">=", startOfMonth),
-                            where("createdAt", "<=", endOfDay),
-                            orderBy("createdAt", "desc"))
+	const postsRef = collection(db, collectionName)
+    
+    const q = query(postsRef, where("uid", "==", user.uid),
+                              where("createdAt", ">=", startOfMonth),
+                              where("createdAt", "<=", endOfDay),
+                              orderBy("createdAt", "desc"))
 
-  fetchInRealtimeAndRenderPostsFromDB(q, user)
+    fetchInRealtimeAndRenderPostsFromDB(q, user)
 }
 
 function fetchAllPosts(user) {
-  const postsRef = collection(db, collectionName)
+    const postsRef = collection(db, collectionName)
+    
+    const q = query(postsRef, where("uid", "==", user.uid),
+                              orderBy("createdAt", "desc"))
 
-  const q = query(postsRef, where("uid", "==", user.uid),
-  orderBy("createdAt", "desc"))
-
-fetchInRealtimeAndRenderPostsFromDB(q, user)    
-
+    fetchInRealtimeAndRenderPostsFromDB(q, user)
 }
-  
+
+/* == Functions - UI Functions == */
+
+function createPostHeader(postData) {
+    /*
+        <div class="header">
+        </div>
+    */
+    const headerDiv = document.createElement("div")
+    headerDiv.className = "header"
+    
+        /* 
+            <h3>21 Sep 2023 - 14:35</h3>
+        */
+        const headerDate = document.createElement("h3")
+        headerDate.textContent = displayDate(postData.createdAt)
+        headerDiv.appendChild(headerDate)
+        
+        /* 
+            <img src="assets/emojis/5.png">
+        */
+        const moodImage = document.createElement("img")
+        moodImage.src = `assets/emojis/${postData.mood}.png`
+        headerDiv.appendChild(moodImage)
+        
+    return headerDiv
+}
+
+function createPostBody(postData) {
+    /*
+        <p>This is a post</p>
+    */
+    const postBody = document.createElement("p")
+    postBody.innerHTML = replaceNewlinesWithBrTags(postData.body)
+    
+    return postBody
+}
 
 function renderPost(postsEl, postData) {
-    postsEl.innerHTML += `
-        <div class="post">
-            <div class="header">
-                <h3>${displayDate(postData.createdAt)}</h3>
-                <img src="assets/emojis/${postData.mood}.png">
-            </div>
-            <p>
-                ${replaceNewlinesWithBrTags(postData.body)}
-            </p>
-        </div>
-    `
+    const postDiv = document.createElement("div")
+    postDiv.className = "post"
+    
+    postDiv.appendChild(createPostHeader(postData))
+    postDiv.appendChild(createPostBody(postData))
+    
+    postsEl.appendChild(postDiv)
 }
 
 function replaceNewlinesWithBrTags(inputString) {
@@ -399,17 +428,16 @@ function updateFilterButtonStyle(element) {
     element.classList.add("selected-filter")
 }
 
-
 function fetchPostsFromPeriod(period, user) {
-  if (period === "today") {
-      fetchTodayPosts(user)
-  } else if (period === "week") {
-      fetchWeekPosts(user)
-  } else if (period === "month") {
-      fetchMonthPosts(user)
-  } else {
-      fetchAllPosts(user)
-  }
+    if (period === "today") {
+        fetchTodayPosts(user)
+    } else if (period === "week") {
+        fetchWeekPosts(user)
+    } else if (period === "month") {
+        fetchMonthPosts(user)
+    } else {
+        fetchAllPosts(user)
+    }
 }
 
 function selectFilter(event) {
