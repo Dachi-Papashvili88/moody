@@ -17,7 +17,7 @@ import {
   query,
   where, orderBy,
   doc,
-  updateDoc 
+  updateDoc, deleteDoc 
 } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -176,6 +176,13 @@ async function updatePostInDB(docId, newBody) {
     })
 }
 
+async function deletePostFromDB(docId) {
+
+      await deleteDoc(doc(db, collectionName, docId));
+
+}
+
+
 function fetchInRealtimeAndRenderPostsFromDB(query, user) {
     onSnapshot(query, (querySnapshot) => {
         clearAll(postsEl)
@@ -311,17 +318,30 @@ function createPostUpdateButton(wholeDoc) {
     return button
 }
 
+
+function createPostDeleteButton(wholeDoc) {
+  const postId = wholeDoc.id
+  
+  /* 
+      <button class="delete-color">Delete</button>
+  */
+  const button = document.createElement('button')
+  button.textContent = 'Delete'
+  button.classList.add("delete-color")
+  button.addEventListener('click', function() {
+      deletePostFromDB(postId)
+  })
+  return button
+}
+
+
 function createPostFooter(wholeDoc) {
-    /* 
-        <div class="footer">
-            <button>Edit</button>
-        </div>
-    */
     const footerDiv = document.createElement("div")
     footerDiv.className = "footer"
     
     footerDiv.appendChild(createPostUpdateButton(wholeDoc))
-    
+    footerDiv.appendChild(createPostDeleteButton(wholeDoc))
+
     return footerDiv
 }
 
