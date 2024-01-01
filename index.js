@@ -235,7 +235,14 @@ const postsRef = collection(db, collectionName)
   fetchInRealtimeAndRenderPostsFromDB(q, user)
 }
 
-/* == Functions - UI Functions == */
+function fetchAllPosts(user) {
+  const q = query(postsRef, where("uid", "==", user.uid),
+  orderBy("createdAt", "desc"))
+
+fetchInRealtimeAndRenderPostsFromDB(q, user)    
+
+}
+  
 
 function renderPost(postsEl, postData) {
     postsEl.innerHTML += `
@@ -402,5 +409,5 @@ function selectFilter(event) {
     
     updateFilterButtonStyle(selectedFilterElement)
     
-    fetchMonthPosts(user)
+    fetchAllPosts(user)
 }
