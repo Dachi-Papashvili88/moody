@@ -96,7 +96,8 @@ onAuthStateChanged(auth, (user) => {
         showLoggedInView()
         showProfilePicture(userProfilePictureEl, user)
         showUserGreeting(userGreetingEl, user)
-        //fetchInRealtimeAndRenderPostsFromDB(user)
+        updateFilterButtonStyle(allFilterButtonEl)
+        fetchAllPosts(user)
     } else {
         showLoggedOutView()
     }
@@ -236,6 +237,8 @@ const postsRef = collection(db, collectionName)
 }
 
 function fetchAllPosts(user) {
+  const postsRef = collection(db, collectionName)
+
   const q = query(postsRef, where("uid", "==", user.uid),
   orderBy("createdAt", "desc"))
 
@@ -396,6 +399,19 @@ function updateFilterButtonStyle(element) {
     element.classList.add("selected-filter")
 }
 
+
+function fetchPostsFromPeriod(period, user) {
+  if (period === "today") {
+      fetchTodayPosts(user)
+  } else if (period === "week") {
+      fetchWeekPosts(user)
+  } else if (period === "month") {
+      fetchMonthPosts(user)
+  } else {
+      fetchAllPosts(user)
+  }
+}
+
 function selectFilter(event) {
     const user = auth.currentUser
     
@@ -409,5 +425,5 @@ function selectFilter(event) {
     
     updateFilterButtonStyle(selectedFilterElement)
     
-    fetchAllPosts(user)
+    fetchPostsFromPeriod(selectedFilterPeriod, user)
 }
